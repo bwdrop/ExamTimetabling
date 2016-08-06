@@ -55,6 +55,11 @@ public final class Term {
         return start.plusDays(index / 2).toDate();
     }
 
+    public int getDayOfWeek(int index) {
+        DateTime start = new DateTime(startDate);
+        return start.plusDays(index / 2).getDayOfWeek();
+    }
+
     // True if AM, False if PM
     public boolean isMorning(int index) {
         return (index % 2) == 0;

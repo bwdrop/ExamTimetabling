@@ -21,5 +21,8 @@ public class Main {
         System.out.println("group n°" + p.getGroup() + " : " + p.getLogin());
         System.out.println(Arrays.toString(p.getSchedule()));
 */
+
+    Timetable ti = new Timetable();
+
     }
 }

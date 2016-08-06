@@ -36,6 +36,12 @@ public class TermTest {
     }
 
     @Test
+    public void getDayOfWeek() throws Exception {
+        assertEquals("First day of exams is Monday", 1, t.getDayOfWeek(0));
+        assertNotEquals("First day of exams isn't Sunday", 7, t.getDayOfWeek(0));
+    }
+
+    @Test
     public void isMorning() throws Exception {
         assertTrue("Morning term", t.isMorning(0));
         assertFalse("Afternoon term", t.isMorning(t.getNbTerms() - 1));
