@@ -19,6 +19,11 @@ public class Person {
         this.schedule = generateSchedule(rnd);
     }
 
+    public Person(int group) {
+        this();
+        this.group = group;
+    }
+
     public Person(String login, int group, int[] schedule) {
         this.login = login;
         this.group = group;
