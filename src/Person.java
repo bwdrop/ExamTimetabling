@@ -9,12 +9,14 @@ public class Person {
     public static final int MIN_EXAMS = 4;
 
     private String login;
+    private String mail;
     private int group;
     private int[] schedule;
 
     public Person() {
         Random rnd = new Random();
         this.login = generateLogin(rnd);
+        this.mail = login + "@kent.ac.uk";
         this.group = rnd.nextInt(GA.NB_GROUPS) + 1; // Group numbers start from 1
         this.schedule = generateSchedule(rnd);
     }
@@ -24,8 +26,9 @@ public class Person {
         this.group = group;
     }
 
-    public Person(String login, int group, int[] schedule) {
+    public Person(String login, String mail, int group, int[] schedule) {
         this.login = login;
+        this.mail = mail;
         this.group = group;
         this.schedule = schedule;
     }
@@ -64,5 +67,9 @@ public class Person {
 
     public int[] getSchedule() {
         return schedule;
+    }
+
+    public String getMail() {
+        return mail;
     }
 }

@@ -1,3 +1,4 @@
+import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import org.joda.time.DateTime;
@@ -17,23 +18,24 @@ import java.util.stream.IntStream;
  * Created by Héliane Ly on 08/08/2016.
  */
 public class CSVManager {
-    public static final int COLUMNS = 4;
+    public static final String[] HEADER = {"Group", "Login", "Mail", "Student?", "Schedule"};
+    public static final int COLUMNS = HEADER.length;
 
     private List<Person> students = new ArrayList<>();
     private List<Person> examiners = new ArrayList<>();
 
     // CSV file is structured as followed:
-    // Group | Login |  Student? |  Schedule
-    // ---------------------------------------------------------
-    //   1   | hl298 |    yes    | 10/05AM, 12/05PM, 20/05AM...
-    //   2   |  mik  |    no     | 09/05AM, 10/05AM, 15/05/AM...
+    // Group | Login |       Mail       |  Student? |  Schedule
+    // ---------------------------------------------------------------------------
+    //   1   | hl298 | hl298@kent.ac.uk |    yes    | 10/05AM, 12/05PM, 20/05AM...
+    //   2   |  mik  |  mik@kent.ac.uk  |    no     | 09/05AM, 10/05AM, 15/05/AM...
 
     public CSVManager() {}
 
     private void addPerson(String[] line) throws ParseException {
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MMa");
-        List<Person> list = (line[2].equalsIgnoreCase("yes")) ? students : examiners;
-        String[] s = line[3].split(",");
+        List<Person> list = (line[3].equalsIgnoreCase("yes")) ? students : examiners;
+        String[] s = line[4].split(",");
         int[] schedule = new int[Term.getInstance().getNbTerms()];
         for (int i = 0; i < s.length; ++i) {
             Date date = fmt.parse(s[i]);
@@ -43,12 +45,12 @@ public class CSVManager {
         }
         if (Integer.parseInt(line[0]) <= 0)
             throw new ParseException("Group number must be positive", 0);
-        list.add(new Person(line[1], Integer.parseInt(line[0]), schedule));
+        list.add(new Person(line[1], line[2], Integer.parseInt(line[0]), schedule));
     }
 
     public int read(String file) {
         try {
-            CSVReader reader = new CSVReader(new FileReader(file));
+            CSVReader reader = new CSVReader(new FileReader(file), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
             String [] nextLine;
             while ((nextLine = reader.readNext()) != null) {
                 if (nextLine.length != COLUMNS)
@@ -70,8 +72,9 @@ public class CSVManager {
                     String[] elem = new String[COLUMNS];
                     elem[0] = Integer.toString(persons.get(i).getGroup());
                     elem[1] = persons.get(i).getLogin();
-                    elem[2] = isStudent ? "yes" : "no";
-                    elem[3] = IntStream.range(0, persons.get(i).getSchedule().length)
+                    elem[2] = persons.get(i).getMail();
+                    elem[3] = isStudent ? "yes" : "no";
+                    elem[4] = IntStream.range(0, persons.get(i).getSchedule().length)
                             .filter(x -> persons.get(i).getSchedule()[x] == 1)
                             .mapToObj(x -> {
                                 Date d = Term.getInstance().getDay(x);
@@ -85,8 +88,9 @@ public class CSVManager {
     public int write(String file) {
         try {
             CSVWriter writer = new CSVWriter(new FileWriter(file));
-            toStringList(students, true).forEach(writer::writeNext);
-            toStringList(examiners, false).forEach(writer::writeNext);
+            writer.writeNext(HEADER);
+            writer.writeAll(toStringList(students, true));
+            writer.writeAll(toStringList(examiners, false));
             writer.close();
         } catch (IOException e) {
             System.err.println("Error: " + e.getMessage());

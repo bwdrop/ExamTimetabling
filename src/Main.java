@@ -1,6 +1,15 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Created by Héliane Ly on 16/07/2016.
@@ -11,26 +20,40 @@ public class Main {
         if (t.init("09/05/2016", "31/05/2016") != 0)
             System.exit(-1);
 
-//        // old
-//        if (t.init("09/05/2016", "11/05/2016") != 0)
-//            System.exit(-1);
-//        students.add(new Person("md527", 1, new int[] {1, 1, 0, 0, 0, 0}));
-//        examiners.add(new Person("dfc", 1, new int [] {0, 0, 0, 0, 1, 0}));
-//        students.add(new Person("hl298", 2, new int[] {0, 1, 1, 0, 0, 0}));
-//        students.add(new Person("ajw83", 2, new int[] {1, 0, 0, 1, 0, 0}));
-//        examiners.add(new Person("mik", 2, new int [] {1, 1, 0, 1, 0, 0}));
+        try (Stream<Path> paths = Files.walk(Paths.get("csv"))) {
+            paths.filter(x -> x.toString().endsWith(".csv"))
+                    .map(x -> x.toString())
+                    .forEach(x -> {
+                        File dir = new File("graph/" + x.substring(x.indexOf("_") + 1, x.indexOf(".")));
+                        dir.mkdir();
+                        generateTimetable(x);
+                    });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        CSVManager csv = new CSVManager();
-        if (csv.read("test02.csv") != 0)
-            System.exit(-1);
-        GA algorithm = new GA();
-        algorithm.run(csv.getStudents(), csv.getExaminers());
-        System.out.println("========================================");
-        List<Timetable> best = algorithm.getBestSolutions();
-        algorithm.printSolutions(best);
+//        generateTimetable("csv/test_20_5_2.csv");
+
+        System.exit(0);
     }
 
-    public void generateCSV() {
+    public static List<Timetable> generateTimetable(String file) {
+        List<Timetable> solutions = new ArrayList<>();
+        CSVManager csv = new CSVManager();
+        if (csv.read(file) != 0)
+            System.exit(-1);
+        for (int i = 0; i < 10; ++i) {
+            GA algorithm = new GA();
+            solutions.add(algorithm.run(csv.getStudents(), csv.getExaminers()));
+            System.out.println("==============================");
+            List<Timetable> best = algorithm.getBestSolutions();
+            algorithm.printSolutions(best);
+        }
+        GA.sort(solutions);
+        return solutions;
+    }
+
+    public static void generateCSV() {
         List<Person> students = new ArrayList<>();
         List<Person> examiners = new ArrayList<>();
         GA.NB_GROUPS = 20;
@@ -47,6 +70,6 @@ public class Main {
         CSVManager csv = new CSVManager();
         csv.setStudents(students);
         csv.setExaminers(examiners);
-        csv.write("test02.csv");
+        csv.write("csv/test_20_5_2.csv");
     }
 }

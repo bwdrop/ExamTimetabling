@@ -1,5 +1,8 @@
-import java.sql.Time;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -9,10 +12,11 @@ import java.util.stream.Stream;
  */
 public class GA {
     // Algorithm Constants
-    public static final int ITERATIONS = 4000000;
-    public static final int POPULATION = 50;
+    public static final int ITERATIONS = 2000;
+    public static final int POPULATION = 200;
     public static final int PROB_MUT = 1;
     public static final int PROB_SWAP = 5;
+    public static final int TOURNAMENT_SIZE = 3;
 
     // User defined constants (will be deduced from input CSV file)
     public static int NB_GROUPS = 20;
@@ -23,23 +27,48 @@ public class GA {
 
     private List<Timetable> pop = new ArrayList<>();
     private Random rnd = new Random();
+    private Chart chart = new Chart();
 
-    public void run(List<Person> students, List<Person> examiners) {
+    public Timetable run(List<Person> students, List<Person> examiners) {
+        SimpleDateFormat fmt = new SimpleDateFormat("ddMMyyy_HHmmss");
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter("graph/20_5_2/graph_" + fmt.format(new Date()) + ".out");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        final long startTime = System.nanoTime();
+
         initPopulation(students, examiners);
         int i;
-        for (i = 0; i < ITERATIONS && getFitness(getBestSolutions().get(0)) != 0; ++i) {
+        for (i = 1; i <= ITERATIONS; ++i) {
             List<Timetable> parents = selectParents();
             Timetable child = crossover(parents.get(0), parents.get(1));
             mutate(child);
             child.evaluateTimetable(students, examiners);
             replaceWith(child);
-            if (i % 10000 == 0) {
-                System.out.println("===== Iteration " + i + " / " + ITERATIONS + " =====");
-                sort(pop);
+            if (i % 100 == 0) {
+                chart.addValue(getFitness(getBestSolutions().get(0)), i);
+                out.println(getFitness(getBestSolutions().get(0)) + " " + i);
+            }
+            if (i % 1000 == 0) {
+                System.out.println("===== Iteration " + i + " / " + ITERATIONS + " (" + (i * 100.0 / ITERATIONS) + "%) =====");
+                System.out.println("===== Different elements : " + pop.stream().distinct().count() + " / " + POPULATION + " =====");
+                System.out.println("===== " + Thread.currentThread().getName() + " =====");
                 printSolutions(pop.subList(0, 10));
             }
         }
         System.out.println("==> TOTAL NUMBER OF ITERATIONS : " + i + " <===");
+
+        final long duration = System.nanoTime() - startTime;
+        System.out.println("===> Duration = " + TimeUnit.NANOSECONDS.toSeconds(duration) + " seconds <===");
+        out.println("==> Duration : " + TimeUnit.NANOSECONDS.toSeconds(duration) + " seconds");
+
+        chart.export("graph/20_5_2/graph_" + fmt.format(new Date()) + ".jpeg");
+        out.close();
+
+        return getBestSolutions().get(0);
     }
 
     public void initPopulation(List<Person> students, List<Person> examiners) {
@@ -68,14 +97,15 @@ public class GA {
 
     public List<Timetable> selectParents() {
         List<Timetable> parents = new ArrayList<>();
-        for (int i = 0; i < 3; ++i) {
-            int r = rnd.nextInt(POPULATION);
-            while (parents.contains(pop.get(r))) // check if same instance
-                r = rnd.nextInt(POPULATION);
-            parents.add(pop.get(r));
+        for (int i = 0; i < 2; ++i) {
+            List<Timetable> tmp = new ArrayList<>();
+            for (int j = 0; j < TOURNAMENT_SIZE; ++j) {
+                int r = rnd.nextInt(POPULATION);
+                tmp.add(pop.get(r));
+            }
+            sort(tmp);
+            parents.add(tmp.get(0));
         }
-        sort(parents); // order is ascending, but best values are closest to 0 ==> Best solutions are first !
-        parents.remove(2); // remove last (worst) timetable
         return parents;
     }
 
@@ -113,6 +143,7 @@ public class GA {
 
     public void replaceWith(Timetable child) {
         List<List<Timetable>> quadrants = new ArrayList<>();
+        sort(pop);
         quadrants.add(pop.stream()
                 .filter(x -> x.getEval()[0] >= child.getEval()[0] && x.getEval()[1] >= child.getEval()[1])
                 .collect(Collectors.toList()));
@@ -128,6 +159,8 @@ public class GA {
         for (int i = 0; i < quadrants.size(); ++i) {
             if (quadrants.get(i).size() > 0) {
                 Timetable toReplace = quadrants.get(i).get(rnd.nextInt(quadrants.get(i).size()));
+                while (pop.indexOf(toReplace) == 0 && quadrants.get(i).size() > 1) // elitism
+                    toReplace = quadrants.get(i).get(rnd.nextInt(quadrants.get(i).size()));
                 pop.remove(toReplace);
                 pop.add(child);
                 return;

@@ -1,11 +1,10 @@
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Years;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Period;
-import org.joda.time.Years;
 
 /**
  * Created by Héliane Ly on 02/08/2016.
@@ -33,9 +32,8 @@ public final class Term {
             nbTerms = (days + 1) * 2;
             if (nbTerms <= 0)
                 throw new IllegalArgumentException("End date must be posterior to start date");
-            if (Years.yearsBetween(new DateTime(startDate), new DateTime(endDate)).getYears() > 0) {
+            if (Years.yearsBetween(new DateTime(startDate), new DateTime(endDate)).getYears() > 0)
                 throw new IllegalArgumentException("Exam period must not exceed one year");
-            }
         } catch (ParseException | IllegalArgumentException e) {
             System.err.println("Error: " + e.getMessage());
             return 1;

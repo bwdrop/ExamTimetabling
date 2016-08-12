@@ -89,4 +89,23 @@ public class Timetable {
     public void setGroup(int group, int term) {
         groups[group] = term;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Timetable timetable = (Timetable) o;
+
+        if (!Arrays.equals(eval, timetable.eval)) return false;
+        return Arrays.equals(groups, timetable.groups);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(eval);
+        result = 31 * result + Arrays.hashCode(groups);
+        return result;
+    }
 }
