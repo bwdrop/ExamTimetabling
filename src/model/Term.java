@@ -1,3 +1,5 @@
+package model;
+
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Years;
@@ -13,7 +15,7 @@ public final class Term {
     private static Term instance = null;
     private Date startDate;
     private Date endDate;
-    private int nbTerms; // length of Term array
+    private int nbTerms; // length of model.Term array
 
     private Term() {}
 

@@ -1,3 +1,6 @@
+import model.GA;
+import model.Person;
+import model.Term;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,6 +45,6 @@ public class PersonTest {
     @Test
     public void checkGroup() throws Exception {
         Person p = new Person();
-        assertTrue("Person group within boundaries", p.getGroup() > 0 && p.getGroup() <= GA.NB_GROUPS);
+        p.getGroups().forEach(g -> assertTrue("model.Person group within boundaries", g > 0 && g <= GA.NB_GROUPS));
     }
 }

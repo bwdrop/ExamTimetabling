@@ -1,3 +1,7 @@
+import model.GA;
+import model.Person;
+import model.Term;
+import model.Timetable;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,11 +23,11 @@ public class TimetableTest {
         Term t = Term.getInstance();
         t.init("01/05/2016", "03/05/2016");
         GA.NB_GROUPS = 2;
-        students.add(new Person("foo", "foo@bar.co.uk", 1, new int[] {1, 1, 0, 0, 0, 0}));
-        examiners.add(new Person("bar", "bar@bar.co.uk", 1, new int [] {0, 0, 0, 0, 1, 0}));
-        students.add(new Person("foo1", "foo1@bar.co.uk", 2, new int[] {0, 1, 1, 0, 0, 0}));
-        students.add(new Person("foo2", "foo2@bar.co.uk", 2, new int[] {1, 0, 0, 1, 0, 0}));
-        examiners.add(new Person("bar1", "bar1@bar.co.uk", 2, new int [] {1, 1, 0, 1, 0, 0}));
+        students.add(new Person("foo", "foo@bar.co.uk", Arrays.asList(new Integer[] {1}), new int[] {1, 1, 0, 0, 0, 0}));
+        examiners.add(new Person("bar", "bar@bar.co.uk", Arrays.asList(new Integer[] {1}), new int [] {0, 0, 0, 0, 1, 0}));
+        students.add(new Person("foo1", "foo1@bar.co.uk", Arrays.asList(new Integer[] {2}), new int[] {0, 1, 1, 0, 0, 0}));
+        students.add(new Person("foo2", "foo2@bar.co.uk", Arrays.asList(new Integer[] {2}), new int[] {1, 0, 0, 1, 0, 0}));
+        examiners.add(new Person("bar1", "bar1@bar.co.uk", Arrays.asList(new Integer[] {2}), new int [] {1, 1, 0, 1, 0, 0}));
     }
 
     @Test
@@ -50,10 +54,10 @@ public class TimetableTest {
 
 //    @Test(expected = NoSuchElementException.class)
 //    public void evaluateInvalidTimetable() {
-////        ArrayList<Integer>[] terms = (ArrayList<Integer>[]) new ArrayList[Term.getInstance().getNbTerms()];
-////        Timetable t = new Timetable(terms);
+////        ArrayList<Integer>[] terms = (ArrayList<Integer>[]) new ArrayList[model.Term.getInstance().getNbTerms()];
+////        model.Timetable t = new model.Timetable(terms);
 //        int[] groups = new int[] {0, 0};
-//        Timetable t = new Timetable(groups);
+//        model.Timetable t = new model.Timetable(groups);
 //        t.evaluateTimetable(students, examiners);
 //    }
 

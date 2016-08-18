@@ -1,3 +1,5 @@
+package model;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -22,18 +24,24 @@ public class GA {
     public static int NB_GROUPS = 20;
 
     // User defined constants (soft constraint)
-    public static final int NB_ROOMS = 1; // Number of rooms available at the same time for exams
-    public static final int NB_DAYS_IN_WEEK = 5; // Number of days in week available to exams (MAX = 7; MIN = 5)
+    public static int NB_ROOMS = 1; // Number of rooms available at the same time for exams
+    public static int NB_DAYS_IN_WEEK = 5; // Number of days in week available to exams (MAX = 7; MIN = 5)
+    public static final int NB_RUNS = 10; // Number of runs of the algorithm
 
     private List<Timetable> pop = new ArrayList<>();
     private Random rnd = new Random();
     private Chart chart = new Chart();
+    private String dir;
+
+    public GA(String file) {
+        dir = file.substring(file.indexOf("_") + 1, file.indexOf("."));
+    }
 
     public Timetable run(List<Person> students, List<Person> examiners) {
         SimpleDateFormat fmt = new SimpleDateFormat("ddMMyyy_HHmmss");
         PrintWriter out = null;
         try {
-            out = new PrintWriter("graph/20_5_2/graph_" + fmt.format(new Date()) + ".out");
+            out = new PrintWriter("graph/" + dir + "/graph_" + fmt.format(new Date()) + ".log");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,22 +58,24 @@ public class GA {
             replaceWith(child);
             if (i % 100 == 0) {
                 chart.addValue(getFitness(getBestSolutions().get(0)), i);
-                out.println(getFitness(getBestSolutions().get(0)) + " " + i);
+                Timetable best = getBestSolutions().get(0);
+                out.println(getFitness(best) + " | " + Arrays.toString(best.getGroups()) + " (" + i + ")");
             }
             if (i % 1000 == 0) {
                 System.out.println("===== Iteration " + i + " / " + ITERATIONS + " (" + (i * 100.0 / ITERATIONS) + "%) =====");
                 System.out.println("===== Different elements : " + pop.stream().distinct().count() + " / " + POPULATION + " =====");
-                System.out.println("===== " + Thread.currentThread().getName() + " =====");
                 printSolutions(pop.subList(0, 10));
             }
         }
-        System.out.println("==> TOTAL NUMBER OF ITERATIONS : " + i + " <===");
+        System.out.println("==> TOTAL NUMBER OF ITERATIONS : " + (i - 1) + " <===");
 
         final long duration = System.nanoTime() - startTime;
         System.out.println("===> Duration = " + TimeUnit.NANOSECONDS.toSeconds(duration) + " seconds <===");
-        out.println("==> Duration : " + TimeUnit.NANOSECONDS.toSeconds(duration) + " seconds");
+        out.println("==> Duration : " + TimeUnit.NANOSECONDS.toSeconds(duration) + " sec, " +
+                (TimeUnit.NANOSECONDS.toMillis(duration) -
+                        TimeUnit.SECONDS.toMillis(TimeUnit.NANOSECONDS.toSeconds(duration))) + " millis"); // TODO MILLISECONDS
 
-        chart.export("graph/20_5_2/graph_" + fmt.format(new Date()) + ".jpeg");
+        chart.export("graph/" + dir + "/graph_" + fmt.format(new Date()) + ".jpeg");
         out.close();
 
         return getBestSolutions().get(0);
@@ -73,7 +83,7 @@ public class GA {
 
     public void initPopulation(List<Person> students, List<Person> examiners) {
         GA.NB_GROUPS = Stream.concat(students.stream(), examiners.stream())
-                .mapToInt(x -> x.getGroup())
+                .mapToInt(x -> Collections.max(x.getGroups()))
                 .max().getAsInt();
         for (int i = 0; i < POPULATION; ++i) {
             Timetable t = new Timetable();
@@ -159,8 +169,6 @@ public class GA {
         for (int i = 0; i < quadrants.size(); ++i) {
             if (quadrants.get(i).size() > 0) {
                 Timetable toReplace = quadrants.get(i).get(rnd.nextInt(quadrants.get(i).size()));
-                while (pop.indexOf(toReplace) == 0 && quadrants.get(i).size() > 1) // elitism
-                    toReplace = quadrants.get(i).get(rnd.nextInt(quadrants.get(i).size()));
                 pop.remove(toReplace);
                 pop.add(child);
                 return;

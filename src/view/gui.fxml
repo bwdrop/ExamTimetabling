@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import jfxtras.scene.control.agenda.Agenda?>
+<?import org.controlsfx.control.ToggleSwitch?>
+
+<BorderPane prefHeight="768.0" prefWidth="1152.0" stylesheets="@gui.css" xmlns="http://javafx.com/javafx/8.0.76-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GuiController">
+    <top>
+        <GridPane hgap="10.0" vgap="10.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label text="Exam period" />
+                <DatePicker fx:id="startDate" promptText="Start date" GridPane.columnIndex="1" />
+                <DatePicker fx:id="endDate" promptText="End date" GridPane.columnIndex="2" />
+                <Label text="Input CSV file" GridPane.rowIndex="1" />
+                <Label fx:id="filePath" textOverrun="LEADING_ELLIPSIS" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Button fx:id="browseBtn" mnemonicParsing="false" onAction="#handleBrowseButtonAction" text="Browse" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <StackPane GridPane.columnSpan="4" GridPane.rowIndex="2">
+                    <children>
+                        <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" StackPane.alignment="TOP_CENTER" />
+                    </children>
+                </StackPane>
+                <Button fx:id="createBtn" defaultButton="true" mnemonicParsing="false" onAction="#handleCreateButtonAction" text="Create timetable" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowSpan="2" />
+            </children>
+        </GridPane>
+    </top>
+    <center>
+        <VBox spacing="5.0">
+            <children>
+                <Separator />
+                <TabPane VBox.vgrow="ALWAYS">
+                    <tabs>
+                        <Tab fx:id="timetableTab" closable="false" onSelectionChanged="#handleTimetableTabChanged" text="Timetables">
+                            <content>
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <TableView fx:id="timetableTable">
+                                            <columns>
+                                                <TableColumn fx:id="hardConflictCol" editable="false" prefWidth="75.0" sortable="false" text="Conflicts" />
+                                                <TableColumn editable="false" prefWidth="75.0" sortable="false" text="Soft conflicts">
+                                                    <columns>
+                                                        <TableColumn fx:id="sameDayCol" editable="false" prefWidth="75.0" sortable="false" text="Same day" />
+                                                        <TableColumn fx:id="nextDayCol" editable="false" prefWidth="75.0" sortable="false" text="Next day" />
+                                                        <TableColumn fx:id="weekendCol" editable="false" prefWidth="75.0" sortable="false" text="Weekend" />
+                                                    </columns>
+                                                </TableColumn>
+                                            </columns>
+                                        </TableView>
+                                        <Agenda fx:id="agenda" allowDragging="false" allowResize="false" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </content>
+                        </Tab>
+                        <Tab closable="false" text="Settings">
+                            <content>
+                                <Accordion fx:id="accordion">
+                                    <panes>
+                                        <TitledPane fx:id="AlgoSettings" animated="true" text="Algorithm">
+                                            <content>
+                                                <GridPane hgap="10.0" vgap="10.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <Label text="Number of rooms available at the same time" GridPane.valignment="TOP" />
+                                                        <Slider fx:id="nbRooms" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" GridPane.columnIndex="1" GridPane.valignment="BASELINE" />
+                                                        <Label text="Number of days available per week" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+                                                        <Slider fx:id="nbDays" blockIncrement="1.0" majorTickUnit="1.0" max="7.0" min="5.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="BASELINE" />
+                                                    </children>
+                                                    <padding>
+                                                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                                    </padding>
+                                                </GridPane>
+
+                                            </content>
+                                        </TitledPane>
+                                        <TitledPane animated="true" text="Outgoing mail">
+                                            <content>
+                                                <GridPane hgap="10.0" vgap="10.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <StackPane maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                            <children>
+                                                                <Label text="On" StackPane.alignment="TOP_RIGHT">
+                                                                    <padding>
+                                                                        <Insets right="50.0" />
+                                                                    </padding>
+                                                                </Label>
+                                                                <ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />
+                                                            </children>
+                                                        </StackPane>
+                                                        <StackPane maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                            <children>
+                                                                <Label text="On" StackPane.alignment="TOP_RIGHT">
+                                                                    <padding>
+                                                                        <Insets right="50.0" />
+                                                                    </padding>
+                                                                </Label>
+                                                                <ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />
+                                                            </children>
+                                                        </StackPane>
+                                          <Label text="SMTP Auth" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+                                          <Label text="SMTP STARTTLS" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                                                    </children>
+                                                    <padding>
+                                                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                                    </padding>
+                                                </GridPane>
+
+                                            </content>
+                                        </TitledPane>
+                                    </panes>
+                                </Accordion>
+                            </content>
+                        </Tab>
+                        <Tab closable="false" text="Test">
+                            <content>
+                                <!--<GridPane hgap="20.0" vgap="20.0">-->
+                                    <!--<columnConstraints>-->
+                                        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
+                                        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
+                                        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
+                                        <!--<ColumnConstraints />-->
+                                    <!--</columnConstraints>-->
+                                    <!--<rowConstraints>-->
+                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />-->
+                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />-->
+                                    <!--</rowConstraints>-->
+                                    <!--<children>-->
+                                        <!--<Label text="Number of rooms available at the same time" GridPane.valignment="TOP" />-->
+                                        <!--<Slider fx:id="nbRooms" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" GridPane.columnIndex="1" GridPane.valignment="BASELINE" />-->
+                                        <!--<Label text="Number of days per week available" GridPane.rowIndex="1" GridPane.valignment="TOP" />-->
+                                        <!--<Slider fx:id="nbDays" blockIncrement="1.0" majorTickUnit="1.0" max="7.0" min="5.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="BASELINE" />-->
+                                        <!--<Separator prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.valignment="CENTER" />-->
+                                        <!--<StackPane maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">-->
+                                            <!--<children>-->
+                                                <!--<Label text="On" StackPane.alignment="TOP_RIGHT">-->
+                                                    <!--<StackPane.margin>-->
+                                                        <!--<Insets />-->
+                                                    <!--</StackPane.margin>-->
+                                                    <!--<padding>-->
+                                                        <!--<Insets right="50.0" />-->
+                                                    <!--</padding>-->
+                                                <!--</Label>-->
+                                                <!--<ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />-->
+                                            <!--</children>-->
+                                        <!--</StackPane>-->
+                                        <!--<StackPane layoutX="394.0" layoutY="180.0" maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">-->
+                                            <!--<children>-->
+                                                <!--<Label text="On" StackPane.alignment="TOP_RIGHT">-->
+                                                    <!--<StackPane.margin>-->
+                                                        <!--<Insets />-->
+                                                    <!--</StackPane.margin>-->
+                                                    <!--<padding>-->
+                                                        <!--<Insets right="50.0" />-->
+                                                    <!--</padding>-->
+                                                <!--</Label>-->
+                                                <!--<ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />-->
+                                            <!--</children>-->
+                                        <!--</StackPane>-->
+                                    <!--</children>-->
+                                    <!--<padding>-->
+                                        <!--<Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />-->
+                                    <!--</padding>-->
+                                <!--</GridPane>-->
+
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </children>
+        </VBox>
+    </center>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+    <bottom>
+        <HBox alignment="CENTER">
+            <children>
+                <Label fx:id="message" />
+                <ButtonBar fx:id="buttonBar" buttonMinWidth="115.0" HBox.hgrow="ALWAYS">
+                    <buttons>
+                        <Button fx:id="prevWeek" mnemonicParsing="false" onAction="#handlePreviousButtonAction" text="Previous week" />
+                        <Button fx:id="nextWeek" mnemonicParsing="false" onAction="#handleNextButtonAction" text="Next week" />
+                        <Button fx:id="sendBtn" mnemonicParsing="false" onAction="#handleSendButtonAction" text="Send mails" />
+                        <Button fx:id="printBtn" mnemonicParsing="false" onAction="#handlePrintButtonAction" text="Print" />
+                    </buttons>
+                    <padding>
+                        <Insets top="10.0" />
+                    </padding>
+                </ButtonBar>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

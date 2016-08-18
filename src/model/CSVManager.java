@@ -1,3 +1,5 @@
+package model;
+
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,24 +31,43 @@ public class CSVManager {
     // Group | Login |       Mail       |  Student? |  Schedule
     // ---------------------------------------------------------------------------
     //   1   | hl298 | hl298@kent.ac.uk |    yes    | 10/05AM, 12/05PM, 20/05AM...
-    //   2   |  mik  |  mik@kent.ac.uk  |    no     | 09/05AM, 10/05AM, 15/05/AM...
+    //  2,3  |  mik  |  mik@kent.ac.uk  |    no     | 09/05AM, 10/05AM, 15/05/AM...
 
     public CSVManager() {}
 
-    private void addPerson(String[] line) throws ParseException {
+    private int[] parseSchedule(String line) throws ParseException {
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MMa");
-        List<Person> list = (line[3].equalsIgnoreCase("yes")) ? students : examiners;
-        String[] s = line[4].split(",");
+        String[] s = line.split(",");
         int[] schedule = new int[Term.getInstance().getNbTerms()];
         for (int i = 0; i < s.length; ++i) {
             Date date = fmt.parse(s[i]);
             DateTime d = new DateTime(date);
             d = d.withYear(Term.getInstance().getYear(d));
+            if (Term.getInstance().getIndex(d) < 0 || Term.getInstance().getIndex(d) >= Term.getInstance().getNbTerms()) {
+                System.err.println("index : " + Term.getInstance().getIndex(d) + " / terms: " + Term.getInstance().getNbTerms());
+                throw new ParseException("Term index must be within bounds", 0);
+            }
             schedule[Term.getInstance().getIndex(d)] = 1;
         }
-        if (Integer.parseInt(line[0]) <= 0)
-            throw new ParseException("Group number must be positive", 0);
-        list.add(new Person(line[1], line[2], Integer.parseInt(line[0]), schedule));
+        return schedule;
+    }
+
+    private List<Integer> parseGroups(String line) throws ParseException {
+        String[] g = line.split(",");
+        List<Integer> groups = new ArrayList<>();
+        for (int i = 0; i < g.length; ++i) {
+            if (Integer.parseInt(g[i]) <= 0)
+                throw new ParseException("Group number must be positive", 0);
+            groups.add(Integer.parseInt(g[i]));
+        }
+        return groups;
+    }
+
+    private void addPerson(String[] line) throws ParseException {
+        List<Person> list = (line[3].equalsIgnoreCase("yes")) ? students : examiners;
+        int[] schedule = parseSchedule(line[4]);
+        List<Integer> groups = parseGroups(line[0]);
+        list.add(new Person(line[1], line[2], groups, schedule));
     }
 
     public int read(String file) {
@@ -70,7 +92,10 @@ public class CSVManager {
         IntStream.range(0, persons.size())
                 .forEach(i -> {
                     String[] elem = new String[COLUMNS];
-                    elem[0] = Integer.toString(persons.get(i).getGroup());
+//                    elem[0] = Integer.toString(persons.get(i).getGroup());
+                    elem[0] = persons.get(i).getGroups().stream()
+                            .map(x -> Integer.toString(x))
+                            .collect(Collectors.joining(","));
                     elem[1] = persons.get(i).getLogin();
                     elem[2] = persons.get(i).getMail();
                     elem[3] = isStudent ? "yes" : "no";

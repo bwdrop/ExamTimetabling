@@ -1,13 +1,11 @@
+package model;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -25,7 +23,7 @@ public class Main {
                     .map(x -> x.toString())
                     .forEach(x -> {
                         File dir = new File("graph/" + x.substring(x.indexOf("_") + 1, x.indexOf(".")));
-                        dir.mkdir();
+                        dir.mkdirs();
                         generateTimetable(x);
                     });
         } catch (IOException e) {
@@ -34,6 +32,8 @@ public class Main {
 
 //        generateTimetable("csv/test_20_5_2.csv");
 
+//        generateCSV();
+
         System.exit(0);
     }
 
@@ -41,14 +41,17 @@ public class Main {
         List<Timetable> solutions = new ArrayList<>();
         CSVManager csv = new CSVManager();
         if (csv.read(file) != 0)
-            System.exit(-1);
-        for (int i = 0; i < 10; ++i) {
-            GA algorithm = new GA();
+            return null;
+        for (int i = 1; i <= GA.NB_RUNS; ++i) {
+            GA algorithm = new GA(file);
             solutions.add(algorithm.run(csv.getStudents(), csv.getExaminers()));
             System.out.println("==============================");
             List<Timetable> best = algorithm.getBestSolutions();
             algorithm.printSolutions(best);
+            GuiModel.getInstance().setProgress(i * 1.0 / GA.NB_RUNS);
         }
+        GuiModel.getInstance().setStudents(csv.getStudents());
+        GuiModel.getInstance().setExaminers(csv.getExaminers());
         GA.sort(solutions);
         return solutions;
     }
@@ -57,15 +60,18 @@ public class Main {
         List<Person> students = new ArrayList<>();
         List<Person> examiners = new ArrayList<>();
         GA.NB_GROUPS = 20;
+        List<Integer> shuffled = new ArrayList<>();
+        IntStream.range(1, GA.NB_GROUPS + 1).forEach(i -> shuffled.add(i));
+        Collections.reverse(shuffled);
+        System.err.println(shuffled);
         IntStream.range(1, GA.NB_GROUPS + 1)
                 .forEach(x -> {
-                    students.add(new Person(x));
-                    students.add(new Person(x));
-                    students.add(new Person(x));
-                    students.add(new Person(x));
-                    students.add(new Person(x));
-                    examiners.add(new Person(x));
-                    examiners.add(new Person(x));
+                    students.add(new Person(new Integer[] {x}));
+                    students.add(new Person(new Integer[] {x}));
+                    students.add(new Person(new Integer[] {x}));
+                    students.add(new Person(new Integer[] {x}));
+                    students.add(new Person(new Integer[] {x}));
+                    examiners.add(new Person(new Integer[] {x, shuffled.get(x - 1)}));
                 });
         CSVManager csv = new CSVManager();
         csv.setStudents(students);

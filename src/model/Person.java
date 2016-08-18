@@ -1,3 +1,8 @@
+package model;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -10,26 +15,27 @@ public class Person {
 
     private String login;
     private String mail;
-    private int group;
+    private List<Integer> groups = new ArrayList<>();
     private int[] schedule;
 
     public Person() {
         Random rnd = new Random();
         this.login = generateLogin(rnd);
         this.mail = login + "@kent.ac.uk";
-        this.group = rnd.nextInt(GA.NB_GROUPS) + 1; // Group numbers start from 1
+        this.groups.add(rnd.nextInt(GA.NB_GROUPS) + 1); // Group numbers start from 1
         this.schedule = generateSchedule(rnd);
     }
 
-    public Person(int group) {
+    // set one group, other group is random
+    public Person(Integer[] groups) {
         this();
-        this.group = group;
+        this.groups = Arrays.asList(groups);
     }
 
-    public Person(String login, String mail, int group, int[] schedule) {
+    public Person(String login, String mail, List<Integer> groups, int[] schedule) {
         this.login = login;
         this.mail = mail;
-        this.group = group;
+        this.groups = groups;
         this.schedule = schedule;
     }
 
@@ -61,8 +67,8 @@ public class Person {
         return login;
     }
 
-    public int getGroup() {
-        return group;
+    public List<Integer> getGroups() {
+        return groups;
     }
 
     public int[] getSchedule() {
