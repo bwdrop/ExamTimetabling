@@ -52,6 +52,11 @@ public class GuiController {
     @FXML private Slider nbRooms;
     @FXML private Slider nbDays;
 
+    @FXML private TextField serverField;
+    @FXML private TextField portField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+
     private final GuiModel model = GuiModel.getInstance();
 
     private final PseudoClass errorClass = PseudoClass.getPseudoClass("error");
@@ -69,6 +74,7 @@ public class GuiController {
             if (b instanceof Button)
                 b.setDisable(true);
         });
+        
         initErrorMessage();
         initTimetableTable();
         initAgenda();

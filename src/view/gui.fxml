@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
@@ -13,6 +14,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -22,7 +24,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import jfxtras.scene.control.agenda.Agenda?>
-<?import org.controlsfx.control.ToggleSwitch?>
 
 <BorderPane prefHeight="768.0" prefWidth="1152.0" stylesheets="@gui.css" xmlns="http://javafx.com/javafx/8.0.76-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GuiController">
     <top>
@@ -110,7 +111,7 @@
 
                                             </content>
                                         </TitledPane>
-                                        <TitledPane animated="true" text="Outgoing mail">
+                                        <TitledPane animated="true" text="Outgoing server (SMTP)">
                                             <content>
                                                 <GridPane hgap="10.0" vgap="10.0">
                                                     <columnConstraints>
@@ -120,35 +121,20 @@
                                                         <ColumnConstraints />
                                                     </columnConstraints>
                                                     <rowConstraints>
-                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                                                     </rowConstraints>
                                                     <children>
-                                                        <StackPane maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                                            <children>
-                                                                <Label text="On" StackPane.alignment="TOP_RIGHT">
-                                                                    <padding>
-                                                                        <Insets right="50.0" />
-                                                                    </padding>
-                                                                </Label>
-                                                                <ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />
-                                                            </children>
-                                                        </StackPane>
-                                                        <StackPane maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                                            <children>
-                                                                <Label text="On" StackPane.alignment="TOP_RIGHT">
-                                                                    <padding>
-                                                                        <Insets right="50.0" />
-                                                                    </padding>
-                                                                </Label>
-                                                                <ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />
-                                                            </children>
-                                                        </StackPane>
-                                          <Label text="SMTP Auth" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-                                          <Label text="SMTP STARTTLS" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                                                        <Label text="SMTP Server" GridPane.valignment="TOP" />
+                                                        <Label text="SMTP Port" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+                                                        <Label text="Email address" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+                                                        <Label text="Password" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                                                        <TextField fx:id="serverField" promptText="smtp.office365.com" GridPane.columnIndex="1" />
+                                                        <TextField fx:id="portField" promptText="587" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                        <TextField fx:id="emailField" promptText="email@kent.ac.uk" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                        <PasswordField fx:id="passwordField" promptText="Password" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                     </children>
                                                     <padding>
                                                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -164,57 +150,57 @@
                         <Tab closable="false" text="Test">
                             <content>
                                 <!--<GridPane hgap="20.0" vgap="20.0">-->
-                                    <!--<columnConstraints>-->
-                                        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
-                                        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
-                                        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
-                                        <!--<ColumnConstraints />-->
-                                    <!--</columnConstraints>-->
-                                    <!--<rowConstraints>-->
-                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
-                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
-                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
-                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
-                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
-                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />-->
-                                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />-->
-                                    <!--</rowConstraints>-->
-                                    <!--<children>-->
-                                        <!--<Label text="Number of rooms available at the same time" GridPane.valignment="TOP" />-->
-                                        <!--<Slider fx:id="nbRooms" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" GridPane.columnIndex="1" GridPane.valignment="BASELINE" />-->
-                                        <!--<Label text="Number of days per week available" GridPane.rowIndex="1" GridPane.valignment="TOP" />-->
-                                        <!--<Slider fx:id="nbDays" blockIncrement="1.0" majorTickUnit="1.0" max="7.0" min="5.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="BASELINE" />-->
-                                        <!--<Separator prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.valignment="CENTER" />-->
-                                        <!--<StackPane maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">-->
-                                            <!--<children>-->
-                                                <!--<Label text="On" StackPane.alignment="TOP_RIGHT">-->
-                                                    <!--<StackPane.margin>-->
-                                                        <!--<Insets />-->
-                                                    <!--</StackPane.margin>-->
-                                                    <!--<padding>-->
-                                                        <!--<Insets right="50.0" />-->
-                                                    <!--</padding>-->
-                                                <!--</Label>-->
-                                                <!--<ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />-->
-                                            <!--</children>-->
-                                        <!--</StackPane>-->
-                                        <!--<StackPane layoutX="394.0" layoutY="180.0" maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">-->
-                                            <!--<children>-->
-                                                <!--<Label text="On" StackPane.alignment="TOP_RIGHT">-->
-                                                    <!--<StackPane.margin>-->
-                                                        <!--<Insets />-->
-                                                    <!--</StackPane.margin>-->
-                                                    <!--<padding>-->
-                                                        <!--<Insets right="50.0" />-->
-                                                    <!--</padding>-->
-                                                <!--</Label>-->
-                                                <!--<ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />-->
-                                            <!--</children>-->
-                                        <!--</StackPane>-->
-                                    <!--</children>-->
-                                    <!--<padding>-->
-                                        <!--<Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />-->
-                                    <!--</padding>-->
+                                <!--<columnConstraints>-->
+                                <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
+                                <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
+                                <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
+                                <!--<ColumnConstraints />-->
+                                <!--</columnConstraints>-->
+                                <!--<rowConstraints>-->
+                                <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />-->
+                                <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />-->
+                                <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />-->
+                                <!--</rowConstraints>-->
+                                <!--<children>-->
+                                <!--<Label text="Number of rooms available at the same time" GridPane.valignment="TOP" />-->
+                                <!--<Slider fx:id="nbRooms" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" GridPane.columnIndex="1" GridPane.valignment="BASELINE" />-->
+                                <!--<Label text="Number of days per week available" GridPane.rowIndex="1" GridPane.valignment="TOP" />-->
+                                <!--<Slider fx:id="nbDays" blockIncrement="1.0" majorTickUnit="1.0" max="7.0" min="5.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="BASELINE" />-->
+                                <!--<Separator prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.valignment="CENTER" />-->
+                                <!--<StackPane maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">-->
+                                <!--<children>-->
+                                <!--<Label text="On" StackPane.alignment="TOP_RIGHT">-->
+                                <!--<StackPane.margin>-->
+                                <!--<Insets />-->
+                                <!--</StackPane.margin>-->
+                                <!--<padding>-->
+                                <!--<Insets right="50.0" />-->
+                                <!--</padding>-->
+                                <!--</Label>-->
+                                <!--<ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />-->
+                                <!--</children>-->
+                                <!--</StackPane>-->
+                                <!--<StackPane layoutX="394.0" layoutY="180.0" maxWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">-->
+                                <!--<children>-->
+                                <!--<Label text="On" StackPane.alignment="TOP_RIGHT">-->
+                                <!--<StackPane.margin>-->
+                                <!--<Insets />-->
+                                <!--</StackPane.margin>-->
+                                <!--<padding>-->
+                                <!--<Insets right="50.0" />-->
+                                <!--</padding>-->
+                                <!--</Label>-->
+                                <!--<ToggleSwitch prefHeight="200.0" prefWidth="200.0" selected="true" />-->
+                                <!--</children>-->
+                                <!--</StackPane>-->
+                                <!--</children>-->
+                                <!--<padding>-->
+                                <!--<Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />-->
+                                <!--</padding>-->
                                 <!--</GridPane>-->
 
                             </content>
