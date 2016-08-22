@@ -1,4 +1,4 @@
-.date-picker:error {
+.date-picker:error, .accordion .titled-pane > *.content .text-field:error, .text-area:error {
     -fx-focus-color: #d35244;
     -fx-faint-focus-color: #d3524422;
 
@@ -14,6 +14,21 @@
     -fx-prompt-text-fill: transparent;
 }
 
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(
+        from 0px .75em to .75em 0px,
+        repeat,
+        -fx-accent 0%,
+        -fx-accent 49%,
+        derive(-fx-accent, 30%) 50%,
+        derive(-fx-accent, 30%) 99%
+    );
+}
+
 .label:error {
     -fx-text-fill: #ff0000;
+}
+
+.label:info {
+    -fx-text-fill: #007fc5;
 }

@@ -18,7 +18,7 @@ public final class GuiModel {
     private final ObjectProperty<Timetable> currentTimetable = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> displayDate = new SimpleObjectProperty<>();
     private final DoubleProperty progress = new SimpleDoubleProperty();
-    private final StringProperty errorMessage = new SimpleStringProperty();
+    private final StringProperty message = new SimpleStringProperty();
 
     private List<Person> students = new ArrayList<>();
     private List<Person> examiners = new ArrayList<>();
@@ -79,16 +79,16 @@ public final class GuiModel {
         this.progress.set(progress);
     }
 
-    public String getErrorMessage() {
-        return errorMessage.get();
+    public String getMessage() {
+        return message.get();
     }
 
-    public StringProperty errorMessageProperty() {
-        return errorMessage;
+    public StringProperty messageProperty() {
+        return message;
     }
 
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage.set(errorMessage);
+    public void setMessage(String message) {
+        this.message.set(message);
     }
 
     public List<Person> getStudents() {

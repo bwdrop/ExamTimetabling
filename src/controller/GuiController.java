@@ -3,7 +3,6 @@ package controller;
 import javafx.animation.FadeTransition;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
 import javafx.scene.control.*;
@@ -11,19 +10,21 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import jfxtras.scene.control.agenda.Agenda;
 import model.*;
+import org.controlsfx.control.ToggleSwitch;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class GuiController {
     @FXML private DatePicker startDate;
@@ -40,6 +41,7 @@ public class GuiController {
     @FXML private TableColumn<Timetable, Number> nextDayCol;
     @FXML private TableColumn<Timetable, Number> weekendCol;
     @FXML private Agenda agenda;
+    private final WeekFields weekFields = WeekFields.of(Locale.getDefault());
 
     @FXML private ButtonBar buttonBar;
     @FXML private Button prevWeek;
@@ -47,19 +49,32 @@ public class GuiController {
     @FXML private Button sendBtn;
     @FXML private Button printBtn;
     @FXML private Label message;
-    private FadeTransition fadeOut = new FadeTransition();
+    private final FadeTransition fadeOut = new FadeTransition();
 
+    @FXML private Tab settingsTab;
+    @FXML private Accordion accordion;
+    @FXML private TitledPane algoSettings;
     @FXML private Slider nbRooms;
     @FXML private Slider nbDays;
 
+    @FXML private TitledPane serverSettings;
+    @FXML private ToggleSwitch authSwitch;
+    @FXML private ToggleSwitch starttlsSwitch;
     @FXML private TextField serverField;
     @FXML private TextField portField;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
 
+    @FXML private TitledPane mailSettings;
+    @FXML private TextField subjectField;
+    @FXML private TextArea messageField;
+
+    private final Mail mail = new Mail();
+
     private final GuiModel model = GuiModel.getInstance();
 
     private final PseudoClass errorClass = PseudoClass.getPseudoClass("error");
+    private final PseudoClass infoClass = PseudoClass.getPseudoClass("info");
 
     @FXML public void initialize() {
         // Reset error pseudoclass on value change
@@ -74,14 +89,52 @@ public class GuiController {
             if (b instanceof Button)
                 b.setDisable(true);
         });
-        
+        accordion.setExpandedPane(algoSettings);
         initErrorMessage();
         initTimetableTable();
         initAgenda();
+        initMail();
+    }
+
+    private void initMail() {
+        // Init switches
+        authSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            authSwitch.setText((authSwitch.isSelected()) ? "On" : "Off");
+            mail.setSmtpAuth((authSwitch.isSelected()) ? "true" : "false");
+        });
+        starttlsSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            starttlsSwitch.setText((starttlsSwitch.isSelected()) ? "On" : "Off");
+            mail.setSmtpStarttls((starttlsSwitch.isSelected()) ? "true" : "false");
+        });
+        authSwitch.setSelected(true);
+        starttlsSwitch.setSelected(true);
+        // Bind to Mail settings
+        serverField.textProperty().bindBidirectional(mail.smtpServerProperty());
+        portField.textProperty().bindBidirectional(mail.smtpPortProperty());
+        emailField.textProperty().bindBidirectional(mail.senderProperty());
+        passwordField.textProperty().bindBidirectional(mail.passwordProperty());
+        subjectField.textProperty().bindBidirectional(mail.subjectProperty());
+        messageField.textProperty().bindBidirectional(mail.bodyProperty());
+        // Reset error pseudoclass on value change
+        serverField.textProperty().addListener((obs, oldVal, newVal) -> serverField.pseudoClassStateChanged(errorClass, false));
+        portField.textProperty().addListener((obs, oldVal, newVal) -> portField.pseudoClassStateChanged(errorClass, false));
+        emailField.textProperty().addListener((obs, oldVal, newVal) -> emailField.pseudoClassStateChanged(errorClass, false));
+        passwordField.textProperty().addListener((obs, oldVal, newVal) -> passwordField.pseudoClassStateChanged(errorClass, false));
+        subjectField.textProperty().addListener((obs, oldVal, newVal) -> subjectField.pseudoClassStateChanged(errorClass, false));
+        messageField.textProperty().addListener((obs, oldVal, newVal) -> messageField.pseudoClassStateChanged(errorClass, false));
+        // init texfield values
+        serverField.setText("smtp.office365.com");
+        portField.setText("587");
+        subjectField.setText("[CO600] Exam date and time for group [GROUP]");
+        messageField.setText("Hello,\n\n" +
+                "This automatic message is to confirm that the final year group project examination for group [GROUP] " +
+                "has been scheduled for the [DATE] from [START_TIME] to [END_TIME].\n" +
+                "Further information about the room allocated to the exam will be communicated shortly.\n\n" +
+                "Yours sincerely,\n" +
+                "Timetabling services");
     }
 
     private void initErrorMessage() {
-        message.pseudoClassStateChanged(errorClass, true);
         fadeOut.setNode(message);
         fadeOut.setDuration(Duration.millis(2500));
         fadeOut.setDelay(Duration.millis(2000));
@@ -89,8 +142,8 @@ public class GuiController {
         fadeOut.setToValue(0.0);
         fadeOut.setCycleCount(1);
         fadeOut.setAutoReverse(false);
-        fadeOut.setOnFinished(actionEvent -> model.setErrorMessage(""));
-        model.errorMessageProperty().addListener((obs, oldVal, newVal) -> {
+        fadeOut.setOnFinished(actionEvent -> model.setMessage(""));
+        model.messageProperty().addListener((obs, oldVal, newVal) -> {
             message.setText(newVal);
             message.setOpacity(1);
             fadeOut.playFromStart();
@@ -114,7 +167,6 @@ public class GuiController {
         }
         // display
         model.displayDateProperty().bindBidirectional(agenda.displayedLocalDateTime());
-        // init appointments
         model.currentTimetableProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 agenda.appointments().clear();
@@ -139,7 +191,6 @@ public class GuiController {
                                             .withSummary("Group " + (g + 1) + "\n" +
                                                     "Students : " + students + "\n" +
                                                     "Examiners : " + examiners)
-                                            .withDescription("Not displayed?")
                                             .withAppointmentGroup(lAppointmentGroupMap.get("group" + String.format("%02d", g + 1)))
                             );
                         });
@@ -147,6 +198,18 @@ public class GuiController {
         });
         // init prevWeek and nextWeek buttons
         model.displayDateProperty().addListener((obs, oldVal, newVal) -> setDisablePrevNextButtons(newVal));
+    }
+
+    private void showError(String msg) {
+        message.pseudoClassStateChanged(infoClass, false);
+        message.pseudoClassStateChanged(errorClass, true);
+        model.setMessage(msg);
+    }
+
+    private void showInfo(String msg) {
+        message.pseudoClassStateChanged(errorClass, false);
+        message.pseudoClassStateChanged(infoClass, true);
+        model.setMessage(msg);
     }
 
     @FXML public void handleBrowseButtonAction(ActionEvent actionEvent) {
@@ -163,7 +226,6 @@ public class GuiController {
     }
 
     private void setDisablePrevNextButtons(LocalDateTime newVal) {
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
         LocalDateTime start = Term.getInstance().getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atTime(14, 0);
         LocalDateTime end = Term.getInstance().getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atTime(14, 0);
         prevWeek.setDisable(!newVal.with(weekFields.dayOfWeek(), 1).isAfter(start.with(weekFields.dayOfWeek(), 1)));
@@ -183,12 +245,14 @@ public class GuiController {
 
     @FXML public void handleCreateButtonAction(ActionEvent actionEvent) {
         if (startDate.getValue() != null && endDate.getValue() != null && !filePath.getText().isEmpty()) {
+            startDate.pseudoClassStateChanged(errorClass, false);
+            endDate.pseudoClassStateChanged(errorClass, false);
+            filePath.pseudoClassStateChanged(errorClass, false);
             String start = startDate.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             String end = endDate.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             Term t = Term.getInstance();
             if (t.init(start, end) != 0) {
-                System.err.println("Invalid start / end dates");
-                model.setErrorMessage("Invalid start / end dates");
+                showError("Invalid start / end dates");
                 startDate.pseudoClassStateChanged(errorClass, true);
                 endDate.pseudoClassStateChanged(errorClass, true);
                 // TODO show invalid start / end date error
@@ -199,17 +263,13 @@ public class GuiController {
             task.setOnSucceeded(t1 -> {
                 List<Timetable> best = task.getValue();
                 if (best == null) {
-                    System.err.println("Invalid CSV file");
-                    model.setErrorMessage("Invalid CSV file");
+                    showError("Invalid CSV file");
                     filePath.pseudoClassStateChanged(errorClass, true);
-                    // TODO show invalid CSV input file
                     setDisableAllButtons(false);
                     return;
                 }
-                startDate.pseudoClassStateChanged(errorClass, false);
-                endDate.pseudoClassStateChanged(errorClass, false);
-                filePath.pseudoClassStateChanged(errorClass, false);
-                model.setDisplayDate(Term.getInstance().getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atTime(14, 0));
+                model.setDisplayDate(Term.getInstance().getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                        .with(weekFields.dayOfWeek(), 1).atTime(14, 0));
                 model.setTimetables(best);
                 model.setCurrentTimetable(best.get(0));
                 // Set selected tab
@@ -218,17 +278,12 @@ public class GuiController {
                 setDisableAllButtons(false);
             });
             new Thread(task).start();
-        }
-    }
-
-    @FXML public void handleTimetableTabChanged(Event event) {
-        if (buttonBar != null && progressBar.getProgress() == 1.0) {
-            buttonBar.getButtons().forEach(b -> {
-                if (b instanceof Button)
-                    b.setDisable(!timetableTab.isSelected());
-            });
-            if (timetableTab.isSelected())
-                setDisablePrevNextButtons(model.getDisplayDate());
+        } else if (filePath.getText().isEmpty()) {
+            showError("Please choose an input CSV file");
+        } else {
+            startDate.pseudoClassStateChanged(errorClass, true);
+            endDate.pseudoClassStateChanged(errorClass, true);
+            showError("Please fill exam start and end dates");
         }
     }
 
@@ -240,25 +295,42 @@ public class GuiController {
         model.setDisplayDate(model.getDisplayDate().plusWeeks(1));
     }
 
+    private void setErrorMailFields(boolean value) {
+        serverField.pseudoClassStateChanged(errorClass, value);
+        portField.pseudoClassStateChanged(errorClass, value);
+        emailField.pseudoClassStateChanged(errorClass, value);
+        passwordField.pseudoClassStateChanged(errorClass, value);
+        subjectField.pseudoClassStateChanged(errorClass, value);
+        messageField.pseudoClassStateChanged(errorClass, value);
+    }
+
     @FXML public void handleSendButtonAction(ActionEvent actionEvent) {
-        Mail mail = new Mail();
-        for (int i = 0; i < GA.NB_GROUPS; ++i) {
-            int g = i;
-            int term = model.getCurrentTimetable().getGroups()[g];
-            SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-            String date = fmt.format(Term.getInstance().getDay(term));
-            String start = (Term.getInstance().isMorning(term)) ? "10am" : "2pm";
-            String end = (Term.getInstance().isMorning(term)) ? "1pm" : "5pm";
-            List<String> to = Stream.concat(model.getStudents().stream(), model.getExaminers().stream())
-                    .filter(x -> x.getGroups().contains(g + 1))
-                    .map(x -> x.getMail())
-                    .collect(Collectors.toList());
-            if (mail.send(to, date, start, end) != 0) {
-                // TODO SHOW ERROR
-                model.setErrorMessage("Error sending mails, please verify parameters and email addresses");
-                System.err.println("Error sending mails, please verify parameters and email addresses");
-                return;
-            }
+        if (serverField.getText() != null && portField.getText() != null &&
+                emailField.getText() != null && passwordField.getText() != null &&
+                subjectField.getText()!= null && messageField.getText() != null) {
+            setErrorMailFields(false);
+            mail.init();
+            sendBtn.setDisable(true);
+            MailTask task = new MailTask(mail);
+            task.setOnSucceeded(t1 -> {
+                if (task.getValue() != 0) {
+                    showError("Error sending mails, please verify parameters and email addresses");
+                    accordion.setExpandedPane(serverSettings);
+                    setErrorMailFields(true);
+                } else {
+                    showInfo("Mails successfully sent");
+                    System.err.println("Mails successfully sent");
+                }
+                sendBtn.setDisable(false);
+            });
+            new Thread(task).start();
+            showInfo("Sending mails...");
+        } else {
+            showError("Mail parameters must be filled");
+            SingleSelectionModel<Tab> selectionModel = settingsTab.getTabPane().getSelectionModel();
+            selectionModel.select(settingsTab);
+            accordion.setExpandedPane(serverSettings);
+            setErrorMailFields(true);
         }
     }
 
@@ -267,6 +339,8 @@ public class GuiController {
         if (job != null && job.showPrintDialog(printBtn.getContextMenu())) {
             agenda.print(job);
             job.endJob();
+            showInfo("Print job sent");
+            System.out.println("Print job sent");
         }
     }
 }
