@@ -32,6 +32,8 @@ public class GA {
     private Random rnd = new Random();
     private Chart chart = new Chart();
     private String dir;
+    private Date now = new Date();
+    private int salt = rnd.nextInt();
 
     public GA(String file) {
         dir = file.substring(file.indexOf("_") + 1, file.indexOf("."));
@@ -41,7 +43,7 @@ public class GA {
         SimpleDateFormat fmt = new SimpleDateFormat("ddMMyyy_HHmmss");
         PrintWriter out = null;
         try {
-            out = new PrintWriter("graph/" + dir + "/graph_" + fmt.format(new Date()) + ".log");
+            out = new PrintWriter("graph/" + dir + "/graph_" + fmt.format(now) + "_" + salt + ".log");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,7 +77,7 @@ public class GA {
                 (TimeUnit.NANOSECONDS.toMillis(duration) -
                         TimeUnit.SECONDS.toMillis(TimeUnit.NANOSECONDS.toSeconds(duration))) + " millis"); // TODO MILLISECONDS
 
-        chart.export("graph/" + dir + "/graph_" + fmt.format(new Date()) + ".jpeg");
+        chart.export("graph/" + dir + "/graph_" + fmt.format(now) + "_" + salt + ".jpeg");
         out.close();
 
         return getBestSolutions().get(0);
