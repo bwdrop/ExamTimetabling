@@ -15,3 +15,7 @@ Exams Timetabling software for CO600 (Kent Dissertation Project)
      * JavaMail 1.5.6
 * ControlsFX 8.40.11 (http://fxexperience.com/controlsfx/)
 
+## Credits
+Icon
+* schedule by Icon Fair from the Noun Project
+* education by Doub.co from the Noun Project
