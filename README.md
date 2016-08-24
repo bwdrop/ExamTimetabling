@@ -1,5 +1,8 @@
+<img src="img/exam_timetabling_icon.png" align="right" height="100" width="100" />
 # ExamTimetabling
 Exams Timetabling software for CO600 (Kent Dissertation Project)
+
+![ExamTimetabling screenshot](img/exam_timetabling_screenshot.png?raw=true)
 
 ## Dependencies
 * Joda-Time 2.9.4 (http://www.joda.org/joda-time/)
