@@ -30,24 +30,43 @@ public class GA {
 
     private List<Timetable> pop = new ArrayList<>();
     private Random rnd = new Random();
+
     private Chart chart = new Chart();
     private String dir;
     private Date now = new Date();
     private int salt = rnd.nextInt();
+    private SimpleDateFormat fmt = new SimpleDateFormat("ddMMyyy_HHmmss");
+    private PrintWriter out = null;
+
+    public GA() {}
 
     public GA(String file) {
         dir = file.substring(file.indexOf("_") + 1, file.indexOf("."));
-    }
-
-    public Timetable run(List<Person> students, List<Person> examiners) {
-        SimpleDateFormat fmt = new SimpleDateFormat("ddMMyyy_HHmmss");
-        PrintWriter out = null;
         try {
             out = new PrintWriter("graph/" + dir + "/graph_" + fmt.format(now) + "_" + salt + ".log");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    private void printLog(String x) {
+        if (out != null)
+            out.println(x);
+    }
+
+    private void addLog(int i) {
+        if (out != null)
+            chart.addValue(getFitness(getBestSolutions().get(0)), i);
+    }
+
+    private void closeLog() {
+        if (out != null) {
+            out.close();
+            chart.export("graph/" + dir + "/graph_" + fmt.format(now) + "_" + salt + ".jpeg");
+        }
+    }
+
+    public Timetable run(List<Person> students, List<Person> examiners) {
         final long startTime = System.nanoTime();
 
         initPopulation(students, examiners);
@@ -59,9 +78,9 @@ public class GA {
             child.evaluateTimetable(students, examiners);
             replaceWith(child);
             if (i % 100 == 0) {
-                chart.addValue(getFitness(getBestSolutions().get(0)), i);
+                addLog(i);
                 Timetable best = getBestSolutions().get(0);
-                out.println(getFitness(best) + " | " + Arrays.toString(best.getGroups()) + " (" + i + ")");
+                printLog(getFitness(best) + " | " + Arrays.toString(best.getGroups()) + " (" + i + ")");
             }
             if (i % 1000 == 0) {
                 System.out.println("===== Iteration " + i + " / " + ITERATIONS + " (" + (i * 100.0 / ITERATIONS) + "%) =====");
@@ -73,12 +92,10 @@ public class GA {
 
         final long duration = System.nanoTime() - startTime;
         System.out.println("===> Duration = " + TimeUnit.NANOSECONDS.toSeconds(duration) + " seconds <===");
-        out.println("==> Duration : " + TimeUnit.NANOSECONDS.toSeconds(duration) + " sec, " +
-                (TimeUnit.NANOSECONDS.toMillis(duration) -
-                        TimeUnit.SECONDS.toMillis(TimeUnit.NANOSECONDS.toSeconds(duration))) + " millis"); // TODO MILLISECONDS
+        printLog("==> Duration : " + TimeUnit.NANOSECONDS.toSeconds(duration) + " sec, " +
+                (TimeUnit.NANOSECONDS.toMillis(duration) - TimeUnit.SECONDS.toMillis(TimeUnit.NANOSECONDS.toSeconds(duration))) + " millis");
 
-        chart.export("graph/" + dir + "/graph_" + fmt.format(now) + "_" + salt + ".jpeg");
-        out.close();
+        closeLog();
 
         return getBestSolutions().get(0);
     }

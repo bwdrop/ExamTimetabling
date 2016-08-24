@@ -19,6 +19,6 @@ public class TimetableTask extends Task<List<Timetable>> {
 
     @Override
     protected List<Timetable> call() throws Exception {
-        return Main.generateTimetable(filePath);
+        return Main.generateTimetable(filePath, false);
     }
 }

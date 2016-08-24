@@ -24,7 +24,7 @@ public class Main {
                     .forEach(x -> {
                         File dir = new File("graph/" + x.substring(x.indexOf("_") + 1, x.indexOf(".")));
                         dir.mkdirs();
-                        generateTimetable(x);
+                        generateTimetable(x, true);
                     });
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,13 +37,18 @@ public class Main {
         System.exit(0);
     }
 
-    public static List<Timetable> generateTimetable(String file) {
+    public static List<Timetable> generateTimetable(String file, boolean debug) {
         List<Timetable> solutions = new ArrayList<>();
         CSVManager csv = new CSVManager();
         if (csv.read(file) != 0)
             return null;
         for (int i = 1; i <= GA.NB_RUNS; ++i) {
-            GA algorithm = new GA(file);
+            GA algorithm;
+            if (debug) {
+                algorithm = new GA(file);
+            } else {
+                algorithm = new GA();
+            }
             solutions.add(algorithm.run(csv.getStudents(), csv.getExaminers()));
             System.out.println("==============================");
             List<Timetable> best = algorithm.getBestSolutions();
