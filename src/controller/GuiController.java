@@ -319,7 +319,6 @@ public class GuiController {
                     setErrorMailFields(true);
                 } else {
                     showInfo("Mails successfully sent");
-                    System.err.println("Mails successfully sent");
                 }
                 sendBtn.setDisable(false);
             });
@@ -340,7 +339,6 @@ public class GuiController {
             agenda.print(job);
             job.endJob();
             showInfo("Print job sent");
-            System.out.println("Print job sent");
         }
     }
 }

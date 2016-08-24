@@ -5,6 +5,7 @@ import model.Timetable;
 import org.junit.Before;
 import org.junit.Test;
 
+import static model.Timetable.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -23,11 +24,11 @@ public class TimetableTest {
         Term t = Term.getInstance();
         t.init("01/05/2016", "03/05/2016");
         GA.NB_GROUPS = 2;
-        students.add(new Person("foo", "foo@bar.co.uk", Arrays.asList(new Integer[] {1}), new int[] {1, 1, 0, 0, 0, 0}));
-        examiners.add(new Person("bar", "bar@bar.co.uk", Arrays.asList(new Integer[] {1}), new int [] {0, 0, 0, 0, 1, 0}));
-        students.add(new Person("foo1", "foo1@bar.co.uk", Arrays.asList(new Integer[] {2}), new int[] {0, 1, 1, 0, 0, 0}));
-        students.add(new Person("foo2", "foo2@bar.co.uk", Arrays.asList(new Integer[] {2}), new int[] {1, 0, 0, 1, 0, 0}));
-        examiners.add(new Person("bar1", "bar1@bar.co.uk", Arrays.asList(new Integer[] {2}), new int [] {1, 1, 0, 1, 0, 0}));
+        students.add(new Person("foo", "foo@bar.co.uk", Arrays.asList(1), new int[] {1, 1, 0, 0, 0, 0}));
+        examiners.add(new Person("bar", "bar@bar.co.uk", Arrays.asList(1), new int [] {0, 0, 0, 0, 1, 0}));
+        students.add(new Person("foo1", "foo1@bar.co.uk", Arrays.asList(2), new int[] {0, 1, 1, 0, 0, 0}));
+        students.add(new Person("foo2", "foo2@bar.co.uk", Arrays.asList(2), new int[] {1, 0, 0, 1, 0, 0}));
+        examiners.add(new Person("bar1", "bar1@bar.co.uk", Arrays.asList(2), new int [] {1, 1, 0, 1, 0, 0}));
     }
 
     @Test
@@ -49,17 +50,8 @@ public class TimetableTest {
         t.evaluateTimetable(students, examiners);
         int[] eval = t.getEval();
         assertEquals("Number of hard constraint violations", 2, eval[0]);
-        assertEquals("Number of soft constraint violations", 1 + 1*4 + 2, eval[1]);
+        assertEquals("Number of soft constraint violations", 1 * SAME_DAY_K + 3 * NEXT_DAY_K + 1 * WEEKEND_K, eval[1]);
     }
-
-//    @Test(expected = NoSuchElementException.class)
-//    public void evaluateInvalidTimetable() {
-////        ArrayList<Integer>[] terms = (ArrayList<Integer>[]) new ArrayList[model.Term.getInstance().getNbTerms()];
-////        model.Timetable t = new model.Timetable(terms);
-//        int[] groups = new int[] {0, 0};
-//        model.Timetable t = new model.Timetable(groups);
-//        t.evaluateTimetable(students, examiners);
-//    }
 
     @Test
     public void evaluatePerfectTimetable() throws Exception {
@@ -68,6 +60,6 @@ public class TimetableTest {
         t.evaluateTimetable(students, examiners);
         int[] eval = t.getEval();
         assertEquals("Number of hard constraint violations", 0, eval[0]);
-        assertEquals("Number of soft constraint violations", 1 + 1, eval[1]);
+        assertEquals("Number of soft constraint violations", 2 * NEXT_DAY_K, eval[1]);
     }
 }

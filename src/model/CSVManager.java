@@ -43,10 +43,8 @@ public class CSVManager {
             Date date = fmt.parse(s[i]);
             DateTime d = new DateTime(date);
             d = d.withYear(Term.getInstance().getYear(d));
-            if (Term.getInstance().getIndex(d) < 0 || Term.getInstance().getIndex(d) >= Term.getInstance().getNbTerms()) {
-                System.err.println("index : " + Term.getInstance().getIndex(d) + " / terms: " + Term.getInstance().getNbTerms());
+            if (Term.getInstance().getIndex(d) < 0 || Term.getInstance().getIndex(d) >= Term.getInstance().getNbTerms())
                 throw new ParseException("Term index must be within bounds", 0);
-            }
             schedule[Term.getInstance().getIndex(d)] = 1;
         }
         return schedule;
@@ -56,14 +54,20 @@ public class CSVManager {
         String[] g = line.split(",");
         List<Integer> groups = new ArrayList<>();
         for (int i = 0; i < g.length; ++i) {
-            if (Integer.parseInt(g[i]) <= 0)
+            int tmp;
+            try {
+                tmp = Integer.parseInt(g[i].trim());
+            } catch (NumberFormatException e) {
+                throw new ParseException("Invalid group number", 0);
+            }
+            if (tmp <= 0)
                 throw new ParseException("Group number must be positive", 0);
-            groups.add(Integer.parseInt(g[i]));
+            groups.add(tmp);
         }
         return groups;
     }
 
-    private void addPerson(String[] line) throws ParseException {
+    public void addPerson(String[] line) throws ParseException {
         List<Person> list = (line[3].equalsIgnoreCase("yes")) ? students : examiners;
         int[] schedule = parseSchedule(line[4]);
         List<Integer> groups = parseGroups(line[0]);
@@ -92,7 +96,6 @@ public class CSVManager {
         IntStream.range(0, persons.size())
                 .forEach(i -> {
                     String[] elem = new String[COLUMNS];
-//                    elem[0] = Integer.toString(persons.get(i).getGroup());
                     elem[0] = persons.get(i).getGroups().stream()
                             .map(x -> Integer.toString(x))
                             .collect(Collectors.joining(","));

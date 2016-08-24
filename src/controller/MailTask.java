@@ -32,10 +32,8 @@ public class MailTask extends Task<Integer> {
                     .filter(x -> x.getGroups().contains(g + 1))
                     .map(x -> x.getMail())
                     .collect(Collectors.toList());
-            if (mail.send(to, date, start, end, g + 1) != 0) {
-                System.err.println("!!!error!!!!");
+            if (mail.send(to, date, start, end, g + 1) != 0)
                 return 1;
-            }
         }
         return 0;
     }

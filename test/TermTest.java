@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
  */
 public class TermTest {
     private Term t = Term.getInstance();
+
     @Before
     public void setUp() throws Exception {
         t.init("09/05/2016", "31/05/2016");

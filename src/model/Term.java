@@ -84,7 +84,7 @@ public final class Term {
     }
 
     public int getIndex(DateTime d) {
-        int index = Days.daysBetween(new DateTime(startDate), d).getDays();
+        int index = Days.daysBetween(new DateTime(startDate), d).getDays() * 2;
         index += (d.getHourOfDay() > 0) ? 1 : 0;
         return index;
     }
