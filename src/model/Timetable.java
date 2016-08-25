@@ -33,11 +33,18 @@ public class Timetable {
         this.groups = groups;
     }
 
+    /**
+     * @param index
+     * @return true if term index is free, false otherwise
+     */
     public boolean isAvailableTerm(int index) {
         return Term.getInstance().getDayOfWeek(index) <= GA.NB_DAYS_IN_WEEK &&
                 Arrays.stream(groups).filter(g -> g == index).count() < GA.NB_ROOMS;
     }
 
+    /**
+     * Generate random timetable
+     */
     public void generateTimetable() {
         Random rnd = new Random();
         for (int i = 0; i < GA.NB_GROUPS; ++i) {
@@ -52,6 +59,10 @@ public class Timetable {
         }
     }
 
+    /**
+     * @param students students list
+     * @return number of soft conflicts on the same day
+     */
     private int evalSameDay(List<Person> students) {
         int same_day = (int) students.stream()
                 .mapToLong(x -> x.getGroups().stream()
@@ -63,6 +74,10 @@ public class Timetable {
         return same_day;
     }
 
+    /**
+     * @param students students list
+     * @return number of soft conflicts on the next day
+     */
     private int evalNextDay(List<Person> students) {
         int next_day = (int) students.stream()
                 .mapToLong(x -> x.getGroups().stream()
@@ -90,12 +105,20 @@ public class Timetable {
         return next_day;
     }
 
+    /**
+     * @return number of soft conflicts on the weekend
+     */
     private int evalWeekend() {
         return (int) IntStream.range(0, groups.length)
                 .filter(g -> Term.getInstance().getDayOfWeek(groups[g]) >= 6)
                 .count();
     }
 
+    /**
+     * Evaluate fitness of the current timetable
+     * @param students list of students
+     * @param examiners list of examiners
+     */
     public void evaluateTimetable(List<Person> students, List<Person> examiners) {
         // eval[0] = conflict count with students & examiners list
         eval[0] = (int) Stream.concat(students.stream(), examiners.stream())

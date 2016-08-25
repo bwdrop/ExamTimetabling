@@ -96,6 +96,9 @@ public class GuiController {
         initMail();
     }
 
+    /**
+     * Initializes the mail fields and related properties
+     */
     private void initMail() {
         // Init switches
         authSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
@@ -134,6 +137,9 @@ public class GuiController {
                 "Timetabling services");
     }
 
+    /**
+     * Initializes error message properties and animation
+     */
     private void initErrorMessage() {
         fadeOut.setNode(message);
         fadeOut.setDuration(Duration.millis(2500));
@@ -150,6 +156,9 @@ public class GuiController {
         });
     }
 
+    /**
+     * Initializes TableView that shows hard and soft conflicts
+     */
     private void initTimetableTable() {
         timetableTable.setItems(model.timetablesProperty());
         hardConflictCol.setCellValueFactory(cellData -> cellData.getValue().hardProperty());
@@ -159,6 +168,9 @@ public class GuiController {
         timetableTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> model.setCurrentTimetable((Timetable) newVal));
     }
 
+    /**
+     * Initializes agenda
+     */
     private void initAgenda() {
         // setup appointment groups
         final Map<String, Agenda.AppointmentGroup> lAppointmentGroupMap = new TreeMap<>();
@@ -200,18 +212,30 @@ public class GuiController {
         model.displayDateProperty().addListener((obs, oldVal, newVal) -> setDisablePrevNextButtons(newVal));
     }
 
+    /**
+     * Show error message
+     * @param msg
+     */
     private void showError(String msg) {
         message.pseudoClassStateChanged(infoClass, false);
         message.pseudoClassStateChanged(errorClass, true);
         model.setMessage(msg);
     }
 
+    /**
+     * Show information message
+     * @param msg
+     */
     private void showInfo(String msg) {
         message.pseudoClassStateChanged(errorClass, false);
         message.pseudoClassStateChanged(infoClass, true);
         model.setMessage(msg);
     }
 
+    /**
+     * Handle browse button
+     * @param actionEvent
+     */
     @FXML public void handleBrowseButtonAction(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open CSV File");
@@ -225,6 +249,10 @@ public class GuiController {
             filePath.setText(file.getAbsolutePath());
     }
 
+    /**
+     * Set disable of Previous week and Next week buttons
+     * @param newVal
+     */
     private void setDisablePrevNextButtons(LocalDateTime newVal) {
         LocalDateTime start = Term.getInstance().getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atTime(14, 0);
         LocalDateTime end = Term.getInstance().getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atTime(14, 0);
@@ -232,6 +260,10 @@ public class GuiController {
         nextWeek.setDisable(!newVal.with(weekFields.dayOfWeek(), 1).isBefore(end.with(weekFields.dayOfWeek(), 1)));
     }
 
+    /**
+     * Set disable of all buttons
+     * @param value
+     */
     private void setDisableAllButtons(boolean value) {
         createBtn.setDisable(value);
         browseBtn.setDisable(value);
@@ -243,6 +275,10 @@ public class GuiController {
             setDisablePrevNextButtons(model.getDisplayDate());
     }
 
+    /**
+     * Handle create button
+     * @param actionEvent unused
+     */
     @FXML public void handleCreateButtonAction(ActionEvent actionEvent) {
         if (startDate.getValue() != null && endDate.getValue() != null && !filePath.getText().isEmpty()) {
             startDate.pseudoClassStateChanged(errorClass, false);
@@ -287,14 +323,26 @@ public class GuiController {
         }
     }
 
+    /**
+     * Handle previous button
+     * @param actionEvent unused
+     */
     @FXML public void handlePreviousButtonAction(ActionEvent actionEvent) {
         model.setDisplayDate(model.getDisplayDate().minusWeeks(1));
     }
 
+    /**
+     * Handle next button
+     * @param actionEvent unused
+     */
     @FXML public void handleNextButtonAction(ActionEvent actionEvent) {
         model.setDisplayDate(model.getDisplayDate().plusWeeks(1));
     }
 
+    /**
+     * Set error on email fields
+     * @param value
+     */
     private void setErrorMailFields(boolean value) {
         serverField.pseudoClassStateChanged(errorClass, value);
         portField.pseudoClassStateChanged(errorClass, value);
@@ -304,6 +352,10 @@ public class GuiController {
         messageField.pseudoClassStateChanged(errorClass, value);
     }
 
+    /**
+     * Handle send button
+     * @param actionEvent unused
+     */
     @FXML public void handleSendButtonAction(ActionEvent actionEvent) {
         if (serverField.getText() != null && portField.getText() != null &&
                 emailField.getText() != null && passwordField.getText() != null &&
@@ -333,6 +385,10 @@ public class GuiController {
         }
     }
 
+    /**
+     * Handle print button
+     * @param actionEvent unused
+     */
     @FXML public void handlePrintButtonAction(ActionEvent actionEvent) {
         PrinterJob job = PrinterJob.createPrinterJob();
         if (job != null && job.showPrintDialog(printBtn.getContextMenu())) {

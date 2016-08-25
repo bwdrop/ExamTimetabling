@@ -8,6 +8,7 @@ import model.Timetable;
 import java.util.List;
 
 /**
+ * Handles the creation of the best timetables separately in a Task
  * Created by Héliane Ly on 17/08/2016.
  */
 public class TimetableTask extends Task<List<Timetable>> {

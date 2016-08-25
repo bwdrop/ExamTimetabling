@@ -31,6 +31,7 @@ public class GA {
     private List<Timetable> pop = new ArrayList<>();
     private Random rnd = new Random();
 
+    // debug specific properties
     private Chart chart = new Chart();
     private String dir;
     private Date now = new Date();
@@ -40,6 +41,11 @@ public class GA {
 
     public GA() {}
 
+    /**
+     * Debug constructor
+     * Initializes debug variables
+     * @param file path to csv file
+     */
     public GA(String file) {
         dir = file.substring(file.indexOf("_") + 1, file.indexOf("."));
         try {
@@ -49,16 +55,27 @@ public class GA {
         }
     }
 
+    /**
+     * Print string to log file
+     * @param x
+     */
     private void printLog(String x) {
         if (out != null)
             out.println(x);
     }
 
+    /**
+     * Add new best solution to chart
+     * @param i the number of iterations
+     */
     private void addLog(int i) {
         if (out != null)
             chart.addValue(getFitness(getBestSolutions().get(0)), i);
     }
 
+    /**
+     * Close log file and export chart
+     */
     private void closeLog() {
         if (out != null) {
             out.close();
@@ -66,6 +83,12 @@ public class GA {
         }
     }
 
+    /**
+     * Run algorithm
+     * @param students list of students
+     * @param examiners list of examiners
+     * @return best solution
+     */
     public Timetable run(List<Person> students, List<Person> examiners) {
         final long startTime = System.nanoTime();
 
@@ -100,6 +123,11 @@ public class GA {
         return getBestSolutions().get(0);
     }
 
+    /**
+     * Initialize population
+     * @param students list of students
+     * @param examiners list of examiners
+     */
     public void initPopulation(List<Person> students, List<Person> examiners) {
         GA.NB_GROUPS = Stream.concat(students.stream(), examiners.stream())
                 .mapToInt(x -> Collections.max(x.getGroups()))
@@ -111,10 +139,19 @@ public class GA {
         }
     }
 
+    /**
+     * Get fitness of solution
+     * @param sln timetable
+     * @return fitness
+     */
     public int getFitness(Timetable sln) {
         return sln.getEval()[0] * 1000 + sln.getEval()[1];
     }
 
+    /**
+     * Sort a list of timetables
+     * @param t list
+     */
     public static void sort(List<Timetable> t) {
         Collections.sort(t, (t1, t2) -> {
             int hComp = Integer.compare(t1.getEval()[0], t2.getEval()[0]);
@@ -124,6 +161,10 @@ public class GA {
         });
     }
 
+    /**
+     * Select two parents from population
+     * @return a list of two parents
+     */
     public List<Timetable> selectParents() {
         List<Timetable> parents = new ArrayList<>();
         for (int i = 0; i < 2; ++i) {
@@ -138,6 +179,12 @@ public class GA {
         return parents;
     }
 
+    /**
+     * Crossover two timetables
+     * @param p1 parent 1
+     * @param p2 parent 2
+     * @return child timetable
+     */
     public Timetable crossover(Timetable p1, Timetable p2) {
         // uniform crossover
         int[] groups = Arrays.copyOf(p1.getGroups(), p1.getGroups().length);
@@ -148,6 +195,10 @@ public class GA {
         return new Timetable(groups);
     }
 
+    /**
+     * Mutate a solution
+     * @param sln timetable
+     */
     public void mutate(Timetable sln)  {
         if (rnd.nextInt(100) < PROB_MUT) {
             // Do course mutation
@@ -170,6 +221,10 @@ public class GA {
         }
     }
 
+    /**
+     * Find a solution in the population to replace with the child
+     * @param child timetable
+     */
     public void replaceWith(Timetable child) {
         List<List<Timetable>> quadrants = new ArrayList<>();
         sort(pop);
@@ -195,11 +250,18 @@ public class GA {
         }
     }
 
+    /**
+     * @return the 10 best solutions of the population
+     */
     public List<Timetable> getBestSolutions() {
         sort(pop);
         return pop.subList(0, 10);
     }
 
+    /**
+     * Print a list of timetables
+     * @param t list of timetables
+     */
     public void printSolutions(List<Timetable> t) {
         for (int i = 0; i < t.size(); ++i) {
             System.out.println(getFitness(t.get(i)) + " | " + Arrays.toString(t.get(i).getGroups()));

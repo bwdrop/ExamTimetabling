@@ -25,6 +25,12 @@ public final class Term {
         return instance;
     }
 
+    /**
+     * Initialize Term with a start and end date
+     * @param start
+     * @param end
+     * @return error status (0 if no error)
+     */
     public int init(String start, String end) {
         try {
             SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
@@ -55,26 +61,48 @@ public final class Term {
         return nbTerms;
     }
 
+    /**
+     * Get day corresponding to specified index
+     * @param index
+     * @return Date
+     */
     public Date getDay(int index) {
         DateTime start = new DateTime(startDate);
         return start.plusDays(index / 2).toDate();
     }
 
+    /**
+     * Get day of week (1 - 7) based on term index
+     * @param index
+     * @return day of week
+     */
     public int getDayOfWeek(int index) {
         DateTime start = new DateTime(startDate);
         return start.plusDays(index / 2).getDayOfWeek();
     }
 
-    // True if AM, False if PM
+    /**
+     * @param index
+     * @return true if index is in the morning, false otherwise
+     */
     public boolean isMorning(int index) {
         return (index % 2) == 0;
     }
 
+    /**
+     * @param idx1 index 1
+     * @param idx2 index 2
+     * @return true if both index are on the same day, false otherwise
+     */
     public boolean isSameDay(int idx1, int idx2) {
         DateTime start = new DateTime(startDate);
         return start.plusDays(idx1 / 2).equals(start.plusDays(idx2 / 2));
     }
 
+    /**
+     * @param d date
+     * @return year of specified date
+     */
     public int getYear(DateTime d) {
         DateTime sd = new DateTime(startDate);
         DateTime ed = new DateTime(endDate);
@@ -83,6 +111,10 @@ public final class Term {
         return (d.withYear(sd.getYear()).isAfter(sd)) ? sd.getYear() : ed.getYear();
     }
 
+    /**
+     * @param d date
+     * @return index corresponding to specified date
+     */
     public int getIndex(DateTime d) {
         int index = Days.daysBetween(new DateTime(startDate), d).getDays() * 2;
         index += (d.getHourOfDay() > 0) ? 1 : 0;

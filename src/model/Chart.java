@@ -17,10 +17,20 @@ public class Chart {
 
     public Chart() {}
 
+    /**
+     * Add value to chart
+     * @param value
+     * @param iteration
+     */
     public void addValue(int value, int iteration) {
         lineChartDataset.addValue((Number) value, "fitness", iteration);
     }
 
+    /**
+     * Export chart to JPEG file
+     * @param filename
+     * @return error status (0 if no error)
+     */
     public int export(String filename) {
         try {
             JFreeChart lineChartObj = ChartFactory.createLineChart(

@@ -35,6 +35,12 @@ public class CSVManager {
 
     public CSVManager() {}
 
+    /**
+     * Parse a schedule consisted of "01/05AM,02/05PM,05/05AM"
+     * @param line
+     * @return an array of integers with the group as index and term as value
+     * @throws ParseException
+     */
     private int[] parseSchedule(String line) throws ParseException {
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MMa");
         String[] s = line.split(",");
@@ -50,6 +56,12 @@ public class CSVManager {
         return schedule;
     }
 
+    /**
+     * Parse a list of groups "1, 3, 8"
+     * @param line
+     * @return a list of groups
+     * @throws ParseException
+     */
     private List<Integer> parseGroups(String line) throws ParseException {
         String[] g = line.split(",");
         List<Integer> groups = new ArrayList<>();
@@ -67,6 +79,11 @@ public class CSVManager {
         return groups;
     }
 
+    /**
+     * Parse a line of the CSV file and add it to the corresponding list (students / examiners)
+     * @param line
+     * @throws ParseException
+     */
     public void addPerson(String[] line) throws ParseException {
         List<Person> list = (line[3].equalsIgnoreCase("yes")) ? students : examiners;
         int[] schedule = parseSchedule(line[4]);
@@ -74,6 +91,11 @@ public class CSVManager {
         list.add(new Person(line[1], line[2], groups, schedule));
     }
 
+    /**
+     * Read / parse the CSV input file and fill the persons lists
+     * @param file
+     * @return
+     */
     public int read(String file) {
         try {
             CSVReader reader = new CSVReader(new FileReader(file), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
@@ -90,6 +112,12 @@ public class CSVManager {
         return 0;
     }
 
+    /**
+     * Convert a list of persons into a list of lines for the CSV file
+     * @param persons
+     * @param isStudent
+     * @return a list of string arrays
+     */
     public List<String[]> toStringList(List<Person> persons, boolean isStudent) {
         List<String[]> list = new ArrayList<>();
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MM");
@@ -113,6 +141,11 @@ public class CSVManager {
         return list;
     }
 
+    /**
+     * Write a CSV file from the students and examiners lists
+     * @param file
+     * @return error status (0 if no error)
+     */
     public int write(String file) {
         try {
             CSVWriter writer = new CSVWriter(new FileWriter(file));

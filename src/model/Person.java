@@ -18,6 +18,9 @@ public class Person {
     private List<Integer> groups = new ArrayList<>();
     private int[] schedule;
 
+    /**
+     * Generate random Person
+     */
     public Person() {
         Random rnd = new Random();
         this.login = generateLogin(rnd);
@@ -26,12 +29,22 @@ public class Person {
         this.schedule = generateSchedule(rnd);
     }
 
-    // set one group, other group is random
+    /**
+     * Generate random Person with specified groups
+     * @param groups list of groups
+     */
     public Person(Integer[] groups) {
         this();
         this.groups = Arrays.asList(groups);
     }
 
+    /**
+     * Generate Person with specified arguments
+     * @param login
+     * @param mail
+     * @param groups
+     * @param schedule
+     */
     public Person(String login, String mail, List<Integer> groups, int[] schedule) {
         this.login = login;
         this.mail = mail;
@@ -39,6 +52,11 @@ public class Person {
         this.schedule = schedule;
     }
 
+    /**
+     * Generate a random login
+     * @param rnd random generator
+     * @return login string
+     */
     public String generateLogin(Random rnd) {
         String INITIALS = "abcdefghijklmnopqrstuvwxyz";
         StringBuilder login = new StringBuilder();
@@ -51,6 +69,11 @@ public class Person {
         return login.toString();
     }
 
+    /**
+     * Generate a random schedule
+     * @param rnd random generator
+     * @return array of int with terms as indexes (0 is free, 1 is occupied)
+     */
     public int[] generateSchedule(Random rnd) {
         int nb_exams = rnd.nextInt(MAX_EXAMS - MIN_EXAMS + 1) + MIN_EXAMS;
         int[] t = new int[Term.getInstance().getNbTerms()];

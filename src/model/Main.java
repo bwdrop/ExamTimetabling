@@ -37,6 +37,12 @@ public class Main {
         System.exit(0);
     }
 
+    /**
+     * Run algorithm and generate best timetables
+     * @param file input CSV file
+     * @param debug whether to keep logs and charts or not
+     * @return list of timetables
+     */
     public static List<Timetable> generateTimetable(String file, boolean debug) {
         List<Timetable> solutions = new ArrayList<>();
         CSVManager csv = new CSVManager();
@@ -61,6 +67,10 @@ public class Main {
         return solutions;
     }
 
+    /**
+     * Generate a csv file with random students and examiners
+     * (for testing purposes)
+     */
     public static void generateCSV() {
         List<Person> students = new ArrayList<>();
         List<Person> examiners = new ArrayList<>();

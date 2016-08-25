@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * Handles sending the mails separately in a Task
  * Created by Héliane Ly on 20/08/2016.
  */
 public class MailTask extends Task<Integer> {

@@ -30,6 +30,9 @@ public class Mail {
 
     public Mail() {}
 
+    /**
+     * Initialize mail service
+     */
     public void init() {
         Properties config = System.getProperties();
         config.setProperty("mail.smtp.host", smtpServer.getValue());
@@ -44,6 +47,15 @@ public class Mail {
         });
     }
 
+    /**
+     * Send mail
+     * @param recipients
+     * @param date
+     * @param start
+     * @param end
+     * @param group
+     * @return error status (0 if no error)
+     */
     public int send(List<String> recipients, String date, String start, String end, int group) {
         try {
             final Message message = new MimeMessage(session);
