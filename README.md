@@ -1,5 +1,7 @@
 <img src="img/exam_timetabling_icon.png" align="right" height="100" width="100" />
+
 # ExamTimetabling
+
 > Exams Timetabling software for CO600 (Kent Dissertation Project).
 
 ExamTimetabling is a Java project which goal is to automate the exam timetabling process of the CO600 module which was done by hand, allowing the task to be completed more quickly and efficiently.
